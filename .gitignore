@@ -56,3 +56,5 @@ dist/
 build/
 coverage/
 *.tsbuildinfo
+
+.claude/
