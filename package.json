@@ -1,0 +1,17 @@
+{
+  "name": "the-training-ground",
+  "version": "1.0.0",
+  "description": "CTF Lab: The Training Ground - Web Vulnerability Exploit Chain",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "sql.js": "^1.11.0"
+  }
+}

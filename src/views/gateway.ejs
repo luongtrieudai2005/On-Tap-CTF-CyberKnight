@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tra cuu thuc tap sinh</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2>He thong tra cuu thuc tap sinh</h2>
+    <p class="text-muted">Nhap ten thuc tap sinh de tim kiem</p>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="input-group mb-3">
+          <input type="text" id="searchInput" class="form-control" placeholder="Nhap ten thuc tap sinh...">
+          <button class="btn btn-primary" onclick="search()">Tim kiem</button>
+        </div>
+      </div>
+    </div>
+    <div id="results" class="mt-4"></div>
+  </div>
+  <script>
+    function search() {
+      const name = document.getElementById('searchInput').value
+      fetch('/api/search?name=' + encodeURIComponent(name))
+        .then(r => r.json())
+        .then(data => {
+          const div = document.getElementById('results')
+          if (data.success) {
+            if (data.data.length === 0) {
+              div.innerHTML = '<div class="alert alert-info">Khong tim thay ket qua.</div>'
+            } else {
+              let html = '<table class="table table-bordered"><thead class="table-dark"><tr><th>ID</th><th>Ho ten</th><th>Email</th><th>Phong ban</th></tr></thead><tbody>'
+              data.data.forEach(row => {
+                html += '<tr><td>' + row.id + '</td><td>' + row.name + '</td><td>' + row.email + '</td><td>' + row.department + '</td></tr>'
+              })
+              html += '</tbody></table>'
+              div.innerHTML = html
+            }
+          } else {
+            div.innerHTML = '<div class="alert alert-danger">Loi: ' + data.error + '</div>'
+          }
+        })
+        .catch(err => {
+          document.getElementById('results').innerHTML = '<div class="alert alert-danger">Loi: ' + err.message + '</div>'
+        })
+    }
+  </script>
+</body>
+</html>
