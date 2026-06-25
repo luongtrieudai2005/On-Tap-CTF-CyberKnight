@@ -18,7 +18,7 @@ Truy cập: http://localhost:3000
 
 Tìm flag hiển thị trên Dashboard của bạn (sau khi đăng nhập) hoặc tại endpoint `/api/flag`.
 
-Flag format: `FLAG{XSS_2_CSRF_<username>_<mã_số>}`
+Flag format: `CKGW{<username>_<mã_số>}`
 
 ---
 

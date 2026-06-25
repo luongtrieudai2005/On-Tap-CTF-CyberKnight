@@ -121,7 +121,7 @@ app.get('/admin/generate_flag', authenticate, authorize('admin'), (req, res) => 
     return res.json({ success: false, error: 'Thiếu tham số user.' })
   }
 
-  const flag = `FLAG{XSS_2_CSRF_${user}_${Date.now().toString(36).toUpperCase()}`
+  const flag = `CKGW{${user}_${Date.now().toString(36).toUpperCase()}`
   run('INSERT OR IGNORE INTO flags (username, flag) VALUES (?, ?)', [user, flag])
   res.json({ success: true, flag })
 })
@@ -158,7 +158,7 @@ function startAdminBot() {
         const match = fb.content.match(/generate_flag\?user=([a-zA-Z0-9_]+)/i)
         if (match) {
           const targetUser = match[1]
-          const flag = `FLAG{XSS_2_CSRF_${targetUser}_${Date.now().toString(36).toUpperCase()}`
+          const flag = `CKGW{${targetUser}_${Date.now().toString(36).toUpperCase()}`
           run('INSERT OR IGNORE INTO flags (username, flag) VALUES (?, ?)', [targetUser, flag])
           console.log(`[AdminBot] ĐÃ TẠO FLAG cho "${targetUser}": ${flag}`)
         }
