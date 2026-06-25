@@ -45,6 +45,9 @@ logs/
 *.log
 /tmp/server.log
 
+# --- Claude / opencode config ---
+.claude/
+
 # --- Docker ---
 .docker/
 
