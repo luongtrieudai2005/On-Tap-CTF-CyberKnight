@@ -14,12 +14,16 @@ app.use(cookieParser())
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send('User-agent: *\nDisallow: /admin/\n/admin/generate_flag')
+})
+
 app.get('/', (req, res) => {
   res.render('index')
 })
 
 app.get('/admin-gateway', (req, res) => {
-  res.status(405).send('Giao thuc khong ho tro. Vui long su dung phuong thuc POST.')
+  res.status(405).send('Giao thức không hỗ trợ. Vui lòng sử dụng phương thức POST.')
 })
 
 app.post('/admin-gateway', (req, res) => {
@@ -44,12 +48,12 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body
   if (!username || !password) {
-    return res.render('login', { error: 'Vui long nhap day du thong tin.' })
+    return res.render('login', { error: 'Vui lòng nhập đầy đủ thông tin.' })
   }
 
   const user = queryOne('SELECT * FROM users WHERE username = ? AND password = ?', [username, password])
   if (!user) {
-    return res.render('login', { error: 'Sai ten dang nhap hoac mat khau.' })
+    return res.render('login', { error: 'Sai tên đăng nhập hoặc mật khẩu.' })
   }
 
   const secret = getConfig('JWT_SECRET') || 'super_secret_key_123'
@@ -66,12 +70,12 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   const { username, password } = req.body
   if (!username || !password) {
-    return res.render('register', { error: 'Vui long nhap day du thong tin.' })
+    return res.render('register', { error: 'Vui lòng nhập đầy đủ thông tin.' })
   }
 
   const existing = queryOne('SELECT id FROM users WHERE username = ?', [username])
   if (existing) {
-    return res.render('register', { error: 'Ten dang nhap da ton tai.' })
+    return res.render('register', { error: 'Tên đăng nhập đã tồn tại.' })
   }
 
   run('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [username, password, 'intern'])
@@ -88,7 +92,7 @@ app.get('/dashboard', authenticate, (req, res) => {
   if (req.user.role === 'employee' || req.user.role === 'admin') {
     return res.redirect('/employee/dashboard')
   }
-  res.status(403).send('Khong co quyen truy cap.')
+  res.status(403).send('Không có quyền truy cập.')
 })
 
 app.get('/employee/dashboard', authenticate, authorize('employee', 'admin'), (req, res) => {
@@ -99,11 +103,11 @@ app.get('/employee/dashboard', authenticate, authorize('employee', 'admin'), (re
 app.post('/api/feedback', authenticate, authorize('employee', 'admin'), (req, res) => {
   const { content } = req.body
   if (!content) {
-    return res.json({ success: false, error: 'Vui long nhap noi dung phan hoi.' })
+    return res.json({ success: false, error: 'Vui lòng nhập nội dung phản hồi.' })
   }
 
   run('INSERT INTO feedbacks (username, content) VALUES (?, ?)', [req.user.username, content])
-  res.json({ success: true, message: 'Phan hoi da duoc gui.' })
+  res.json({ success: true, message: 'Phản hồi đã được gửi.' })
 })
 
 app.get('/admin/review-feedbacks', authenticate, authorize('admin'), (req, res) => {
@@ -114,7 +118,7 @@ app.get('/admin/review-feedbacks', authenticate, authorize('admin'), (req, res) 
 app.get('/admin/generate_flag', authenticate, authorize('admin'), (req, res) => {
   const { user } = req.query
   if (!user) {
-    return res.json({ success: false, error: 'Thieu tham so user.' })
+    return res.json({ success: false, error: 'Thiếu tham số user.' })
   }
 
   const flag = `FLAG{XSS_2_CSRF_${user}_${Date.now().toString(36).toUpperCase()}`
@@ -127,7 +131,7 @@ app.get('/api/flag', authenticate, (req, res) => {
   if (flagRow) {
     return res.json({ success: true, flag: flagRow.flag })
   }
-  res.json({ success: false, message: 'Flag chua duoc tao. Hay gui XSS va cho Admin Bot duyet.' })
+  res.json({ success: false, message: 'Flag chưa được tạo. Hãy gửi XSS và chờ Admin Bot duyệt.' })
 })
 
 app.get('/logout', (req, res) => {
@@ -136,19 +140,19 @@ app.get('/logout', (req, res) => {
 })
 
 app.use((req, res) => {
-  res.status(404).send('Khong tim thay trang.')
+  res.status(404).send('Không tìm thấy trang.')
 })
 
 function startAdminBot() {
   const INTERVAL = 20000
-  console.log(`[AdminBot] Khoi dong. Kiem tra moi ${INTERVAL / 1000}s`)
+  console.log(`[AdminBot] Khởi động. Kiểm tra mỗi ${INTERVAL / 1000}s`)
 
   setInterval(() => {
     try {
       const unread = queryAll("SELECT * FROM feedbacks WHERE reviewed = 0")
       if (unread.length === 0) return
 
-      console.log(`[AdminBot] Phat hien ${unread.length} phan hoi moi. Dang xu ly...`)
+      console.log(`[AdminBot] Phát hiện ${unread.length} phản hồi mới. Đang xử lý...`)
 
       for (const fb of unread) {
         const match = fb.content.match(/generate_flag\?user=([a-zA-Z0-9_]+)/i)
@@ -156,13 +160,13 @@ function startAdminBot() {
           const targetUser = match[1]
           const flag = `FLAG{XSS_2_CSRF_${targetUser}_${Date.now().toString(36).toUpperCase()}`
           run('INSERT OR IGNORE INTO flags (username, flag) VALUES (?, ?)', [targetUser, flag])
-          console.log(`[AdminBot] DA TAO FLAG cho "${targetUser}": ${flag}`)
+          console.log(`[AdminBot] ĐÃ TẠO FLAG cho "${targetUser}": ${flag}`)
         }
 
         run('UPDATE feedbacks SET reviewed = 1 WHERE id = ?', [fb.id])
       }
     } catch (err) {
-      console.error('[AdminBot] Loi:', err.message)
+      console.error('[AdminBot] Lỗi:', err.message)
     }
   }, INTERVAL)
 }
@@ -170,9 +174,9 @@ function startAdminBot() {
 initDatabase().then(() => {
   startAdminBot()
   app.listen(PORT, () => {
-    console.log(`Server dang chay tai cong ${PORT}`)
+    console.log(`Server đang chạy tại cổng ${PORT}`)
   })
 }).catch(err => {
-  console.error('Loi khoi tao database:', err)
+  console.error('Lỗi khởi tạo database:', err)
   process.exit(1)
 })

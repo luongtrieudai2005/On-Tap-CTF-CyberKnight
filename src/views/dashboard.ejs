@@ -10,30 +10,30 @@
   <div class="container mt-5">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h3>Xin chao, <%= user.username %></h3>
-        <a href="/logout" class="btn btn-outline-danger btn-sm">Dang xuat</a>
+        <h3>Xin chào, <%= user.username %></h3>
+        <a href="/logout" class="btn btn-outline-danger btn-sm">Đăng xuất</a>
       </div>
       <div class="card-body">
         <div class="alert alert-info">
-          <strong>Vai tro cua ban:</strong> <%= user.role %>
+          <strong>Vai trò của bạn:</strong> <%= user.role %>
         </div>
 
         <% if (flag) { %>
           <div class="alert alert-success">
-            <strong>Chuc mung! Flag cua ban:</strong><br>
+            <strong>Chúc mừng! Flag của bạn:</strong><br>
             <code style="font-size: 1.2em;"><%= flag %></code>
           </div>
         <% } else { %>
           <div class="alert alert-warning">
-            Flag chua duoc tao. Hoan thanh chuoi khai thac de nhan flag.
+            Flag chưa được tạo. Hoàn thành chuỗi khai thác để nhận flag.
           </div>
         <% } %>
 
-        <p>Day la trang danh cho thuc tap sinh. Ban khong co quyen truy cap vao khu vuc nhan vien.</p>
+        <p>Đây là trang dành cho thực tập sinh. Bạn không có quyền truy cập vào khu vực nhân viên.</p>
         <div class="mt-4 p-3 bg-warning bg-opacity-10 border border-warning rounded">
           <small>
-            <strong>Luu y:</strong> Neu ban la nhan vien, vui long dang nhap voi tai khoan co quyen cao hon
-            hoac lien he voi quan tri vien de cap quyen.
+            <strong>Lưu ý:</strong> Nếu bạn là nhân viên, vui lòng đăng nhập với tài khoản có quyền cao hơn
+            hoặc liên hệ với quản trị viên để cấp quyền.
           </small>
         </div>
       </div>

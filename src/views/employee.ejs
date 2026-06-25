@@ -10,32 +10,33 @@
   <div class="container mt-5">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h3>Khu vuc nhan vien</h3>
+        <h3>Khu vực nhân viên</h3>
         <div>
           <span class="badge bg-success me-2"><%= user.role %></span>
           <span class="me-3"><%= user.username %></span>
-          <a href="/logout" class="btn btn-outline-danger btn-sm">Dang xuat</a>
+          <a href="/logout" class="btn btn-outline-danger btn-sm">Đăng xuất</a>
         </div>
       </div>
       <div class="card-body">
-        <h5>Gui phan hoi cho Ban Giam Doc</h5>
-        <p class="text-muted">Nhap y kien dong gop cua ban duoi day:</p>
+        <h5>Gửi phản hồi cho Ban Giám Đốc</h5>
+        <!-- ADMIN_API: /admin/generate_flag?user=<username> -->
+        <p class="text-muted">Nhập ý kiến đóng góp của bạn dưới đây:</p>
 
         <div class="row">
           <div class="col-md-8">
             <div class="mb-3">
-              <textarea id="feedbackContent" class="form-control" rows="4" placeholder="Nhap noi dung phan hoi..."></textarea>
+              <textarea id="feedbackContent" class="form-control" rows="4" placeholder="Nhập nội dung phản hồi..."></textarea>
             </div>
-            <button class="btn btn-primary" onclick="submitFeedback()">Gui phan hoi</button>
+            <button class="btn btn-primary" onclick="submitFeedback()">Gửi phản hồi</button>
             <div id="feedbackMessage" class="mt-2"></div>
           </div>
         </div>
 
         <hr class="my-4">
 
-        <h5>Lich su phan hoi cua ban</h5>
+        <h5>Lịch sử phản hồi của bạn</h5>
         <% if (feedbacks.length === 0) { %>
-          <p class="text-muted">Chua co phan hoi nao.</p>
+          <p class="text-muted">Chưa có phản hồi nào.</p>
         <% } else { %>
           <div class="list-group">
             <% feedbacks.forEach(function(fb) { %>
@@ -43,9 +44,9 @@
                 <div class="d-flex justify-content-between">
                   <small class="text-muted"><%= fb.created_at %></small>
                   <% if (fb.reviewed) { %>
-                    <span class="badge bg-success">Da xem</span>
+                    <span class="badge bg-success">Đã xem</span>
                   <% } else { %>
-                    <span class="badge bg-warning text-dark">Chua xem</span>
+                    <span class="badge bg-warning text-dark">Chưa xem</span>
                   <% } %>
                 </div>
                 <p class="mb-1 mt-1"><%= fb.content %></p>
@@ -61,7 +62,7 @@
     function submitFeedback() {
       const content = document.getElementById('feedbackContent').value
       if (!content) {
-        document.getElementById('feedbackMessage').innerHTML = '<div class="alert alert-warning">Vui long nhap noi dung.</div>'
+        document.getElementById('feedbackMessage').innerHTML = '<div class="alert alert-warning">Vui lòng nhập nội dung.</div>'
         return
       }
 
@@ -74,7 +75,7 @@
       .then(data => {
         const msg = document.getElementById('feedbackMessage')
         if (data.success) {
-          msg.innerHTML = '<div class="alert alert-success">Phan hoi da duoc gui!</div>'
+          msg.innerHTML = '<div class="alert alert-success">Phản hồi đã được gửi!</div>'
           document.getElementById('feedbackContent').value = ''
           setTimeout(() => location.reload(), 1000)
         } else {
